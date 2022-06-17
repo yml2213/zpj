@@ -13283,4 +13283,226 @@
   },
   {},
   [98]
-)
+),
+  document.addEventListener("DOMContentLoaded", (e) => {
+    initCookie(), checkLoginStatus();
+  });
+var initCookie = function () {
+    var e = document.getElementById("cookie-notice");
+    if (e) {
+      var t = "";
+      if (-1 !== document.cookie.search("_pb_ck_")) {
+        var n = RegExp("_pb_ck_[^;]+").exec(document.cookie);
+        t = unescape(n ? n.toString().replace(/^[^=]+./, "") : "");
+      }
+      if (2 === t || "2" === t) e.remove();
+      else {
+        e.classList.remove("-hide");
+        var a = document.getElementById("cookie-accept");
+        if (a) {
+          a.addEventListener("click", function (e) {
+            i();
+          }),
+            a.addEventListener(
+              "touchstart",
+              function (e) {
+                i();
+              },
+              { passive: !0 }
+            );
+          var i = function () {
+            "function" != typeof consentGranted
+              ? console.warn("consentGranted: not found")
+              : ((document.cookie = "_pb_ck_=2; path=/"),
+                consentGranted(),
+                e.remove());
+          };
+        }
+      }
+    }
+  },
+  checkLoginStatus = function () {
+    var e = document.getElementById("desktop-lag-list"),
+      t = document.getElementById("login-section"),
+      n = document.getElementById("app-logout-desk"),
+      a = document.getElementById("app-logout-mobi"),
+      i = function () {
+        t.classList.add("-hide"),
+          e && e.classList.add("-hide"),
+          n && n.classList.remove("-hide");
+      };
+    if (t)
+      if ("" !== getCookie("_PB4_")) {
+        console.log("pb4");
+        var r = document.getElementById("pb4-login-desk");
+        r && r.classList.remove("-hide");
+        var s = document.getElementById("pb4-login-mobi");
+        s && s.classList.remove("-hide"), a && a.classList.remove("-hide"), i();
+      } else if (getCookie("_PB3_")) {
+        console.log("pb3");
+        var o = document.getElementById("pb3-login-desk");
+        o && o.classList.remove("-hide");
+        var l = document.getElementById("pb3-login-mobi");
+        l && l.classList.remove("-hide"), a && a.classList.remove("-hide"), i();
+      }
+  },
+  reCaptcha = function (e, t) {
+    grecaptcha.ready(function () {
+      grecaptcha
+        .execute("6Lc-KEkbAAAAAOm2rNxaFOGPJArssPyclOPHKlFY", { action: e })
+        .then(function (e) {
+          t(e);
+        });
+    });
+  },
+  showHideContent = function (e, t, n, a, i) {
+    i || (i = 500),
+      fadeOut(t),
+      setTimeout(function () {
+        hide(t), show(e), fadeIn(e), n && t.remove(), a && a();
+      }, i);
+  },
+  addClass = function (e, t) {
+    e.classList.add(t);
+  },
+  removeClass = function (e, t) {
+    e.classList.remove(t);
+  },
+  fadeIn = function (e) {
+    removeClass(e, "animate__fadeOut"), addClass(e, "animate__fadeIn");
+  },
+  fadeOut = function (e) {
+    removeClass(e, "animate__fadeIn"), addClass(e, "animate__fadeOut");
+  },
+  show = function (e) {
+    removeClass(e, "-hide");
+  },
+  hide = function (e) {
+    addClass(e, "-hide");
+  },
+  onClick = function (e, t) {
+    e.addEventListener("click", function (e) {
+      e.preventDefault(), t(e);
+    }),
+      e.addEventListener(
+        "touchstart",
+        function (e) {
+          e.preventDefault(), t(e);
+        },
+        { passive: !0 }
+      );
+  },
+  onClickRemove = function (e) {
+    e.removeEventListener("click", function (e) {}),
+      e.removeEventListener("touchstart", function (e) {});
+  },
+  displayLocalError = function (e, t) {
+    var n = document.getElementById(e + "-parent");
+    n && addClass(n, "-error"),
+      (e = t && "" !== t ? e + "-local-" + t : e + "-local"),
+      (n = document.getElementById(e)) && show(n);
+  },
+  displayServerError = function (e, t, n) {
+    n && e
+      ? ((e.innerText = n), t && hide(t), show(e))
+      : t && (e && hide(e), show(t));
+  },
+  onFocusEventListener = function (e) {
+    var t = document.getElementById(e + "-input");
+    t &&
+      (t.addEventListener("focus", function () {
+        handleOnFocusAction(e);
+      }),
+      t.addEventListener("keydown", function () {
+        handleOnFocusAction(e);
+      }));
+  },
+  handleOnFocusAction = function (e) {
+    var t = document.getElementById(e + "-parent");
+    t && removeClass(t, "-error");
+    var n = document.getElementsByClassName(e + "-error");
+    if (n && n.length && n.length > 0)
+      for (var a = 0; a < n.length; a++) hide(n[a]);
+  },
+  getAxiosPostOptions = function (e, t, n) {
+    return {
+      url: e,
+      method: "POST",
+      headers: {
+        "X-CSRF-KEY": t,
+        "Content-Type": "application/json;charset=UTF-8",
+      },
+      data: n,
+    };
+  },
+  isEmailAddress = function (e) {
+    if ("" === e) return "empty";
+    return /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
+      e
+    )
+      ? ""
+      : "invalid";
+  },
+  isValidPassword = function (e) {
+    if ("" === e) return "empty";
+    var t = 1,
+      n = 1,
+      a = 1,
+      i = e.length;
+    if (0 === i) return "empty";
+    if (i < 6) return "min";
+    if (i > 64) return "max";
+    for (var r = 0; r < i; r++)
+      e[r].match(new RegExp("^[a-z]+$"))
+        ? n--
+        : e[r].match(new RegExp("^[A-Z]+$"))
+        ? t--
+        : e[r].match(new RegExp("^[0-9]+$")) && a--;
+    return t > 0 ? "upper" : n > 0 ? "lower" : a > 0 ? "num" : "";
+  },
+  isMobile = function () {
+    var e = window.navigator.userAgent;
+    try {
+      return null !== new MobileDetect(e).mobile();
+    } catch (t) {
+      return !!(
+        e.match(/Android/i) ||
+        e.match(/webOS/i) ||
+        e.match(/iPhone/i) ||
+        e.match(/iPod/i) ||
+        e.match(/BlackBerry/i) ||
+        e.match(/Windows Phone/i) ||
+        e.match(/Windows Mobile/i) ||
+        e.match(/Nokia/i) ||
+        e.match(/IEMobile/i) ||
+        e.match(/Mobile/i) ||
+        e.match(/Opera Mini/i) ||
+        e.match(/Opera Mobi/i)
+      );
+    }
+  },
+  setCookie = function (e, t, n) {
+    var a = new Date();
+    a.setTime(a.getTime() + n);
+    var i = "expires=" + a.toUTCString();
+    document.cookie = e + "=" + t + "; path=/; " + i;
+  },
+  getCookie = function (e) {
+    var t = RegExp(e + "[^;]+").exec(document.cookie);
+    return unescape(t ? t.toString().replace(/^[^=]+./, "") : "");
+  },
+  deleteCookie = function (e) {
+    document.cookie = e + "=;expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+  },
+  encode = function (e) {
+    return window.btoa(unescape(encodeURIComponent(e)));
+  },
+  encodeSchool = function (e, t) {
+    return encode(JSON.stringify({ guid: e, title: t }));
+  },
+  decode = function (e) {
+    return decodeURIComponent(escape(window.atob(e)));
+  },
+  schoolEncode = function (e) {
+    return JSON.parse(decode(e));
+  };
